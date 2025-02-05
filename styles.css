@@ -97,9 +97,9 @@ body {
   background-color: var(--background-color);
   padding: 30px;
   border-radius: 15px;
-  width: 100%;
-  max-width: 500px;
-  max-height: 90vh;
+  width: 800px;
+  height: 500px;
+  /* 高さを固定する場合、必要に応じて overflow-y: auto; を追加 */
   overflow-y: auto;
   box-shadow: 0 5px 15px rgba(0,0,0,0.3);
   animation: modalFadeIn 0.3s ease-out;
@@ -224,7 +224,7 @@ body {
   border-bottom: 1px solid var(--color-dark);
 }
 .work-item-info .reg-name {
-  font-size: 1.8rem;  /* 大、太字 */
+  font-size: 1.35rem; /* 1.8remの75% */
   font-weight: bold;
   margin-bottom: 5px;
 }
@@ -244,13 +244,16 @@ body {
   border-radius: 4px;
   overflow: hidden;
   background-color: var(--background-color);
-  min-height: 150px;
+  width: 240px;
+  height: 240px;
 }
 .work-thumbnail img {
   width: 100%;
-  display: block;
+  height: 100%;
+  object-fit: contain;
   transition: transform 0.3s;
 }
+
 .work-thumbnail:hover img {
   transform: scale(1.05);
 }
@@ -279,6 +282,7 @@ body {
 .full-image-modal {
   max-width: 800px;
   width: 90%;
+  overflow: visible;
   /* モーダルと同じデザイン */
 }
 .full-image-container {
@@ -294,7 +298,9 @@ body {
   transition: transform 0.3s;
 }
 .full-image-container img:hover {
-  transform: scale(1.05);
+  transform: scale(1.1);
+  position: relative;
+  z-index: 999;
 }
 .modal-close-btn {
   display: block;

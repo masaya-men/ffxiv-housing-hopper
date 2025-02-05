@@ -127,79 +127,79 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  /* --- グリッド表示エリアの更新 --- */
-  function updateGrid(tweetData, regInfo) {
-    const worksGrid = document.getElementById('works-grid');
-    // worksGrid.innerHTML = '';
+/* --- グリッド表示エリアの更新 --- */
+function updateGrid(tweetData, regInfo) {
+  const worksGrid = document.getElementById('works-grid');
+  // ※ 既存の登録内容を残すため、innerHTML のクリアは行わない
 
-    // グリッドアイテム全体のラッパーを生成
-    const wrapper = document.createElement('div');
-    wrapper.className = 'grid-item-wrapper';
+  // グリッドアイテム全体のラッパーを生成
+  const wrapper = document.createElement('div');
+  wrapper.className = 'grid-item-wrapper';
 
-    // 情報エリア（上段、左詰め）
-    const infoDiv = document.createElement('div');
-    infoDiv.className = 'work-item-info';
-    const nameEl = document.createElement('div');
-    nameEl.className = 'reg-name';
-    nameEl.textContent = regInfo.registrantName;
-    const dataCenterEl = document.createElement('div');
-    dataCenterEl.className = 'data-center';
-    dataCenterEl.textContent = regInfo.dataCenter;
-    const worldEl = document.createElement('div');
-    worldEl.className = 'world';
-    worldEl.textContent = regInfo.world;
-    const addressEl = document.createElement('div');
-    addressEl.className = 'address-info';
-    addressEl.textContent = regInfo.addressData;
-    const urlEl = document.createElement('div');
-    urlEl.className = 'sns-url';
-    const urlLink = document.createElement('a');
-    urlLink.href = regInfo.postUrl;
-    urlLink.target = '_blank';
-    urlLink.textContent = "ポストを見にいく";
-    urlEl.appendChild(urlLink);
-    
-    infoDiv.appendChild(nameEl);
-    infoDiv.appendChild(dataCenterEl);
-    infoDiv.appendChild(worldEl);
-    infoDiv.appendChild(addressEl);
-    infoDiv.appendChild(urlEl);
+  // 情報エリア（上段、左詰め）
+  const infoDiv = document.createElement('div');
+  infoDiv.className = 'work-item-info';
+  const nameEl = document.createElement('div');
+  nameEl.className = 'reg-name';
+  nameEl.textContent = regInfo.registrantName;
+  const dataCenterEl = document.createElement('div');
+  dataCenterEl.className = 'data-center';
+  dataCenterEl.textContent = regInfo.dataCenter;
+  const worldEl = document.createElement('div');
+  worldEl.className = 'world';
+  worldEl.textContent = regInfo.world;
+  const addressEl = document.createElement('div');
+  addressEl.className = 'address-info';
+  addressEl.textContent = regInfo.addressData;
+  const urlEl = document.createElement('div');
+  urlEl.className = 'sns-url';
+  const urlLink = document.createElement('a');
+  urlLink.href = regInfo.postUrl;
+  urlLink.target = '_blank';
+  urlLink.textContent = "ポストを見にいく";
+  urlEl.appendChild(urlLink);
+  
+  infoDiv.appendChild(nameEl);
+  infoDiv.appendChild(dataCenterEl);
+  infoDiv.appendChild(worldEl);
+  infoDiv.appendChild(addressEl);
+  infoDiv.appendChild(urlEl);
 
-    // サムネイルエリア（下段）：枠線で囲む
-    const thumbDiv = document.createElement('div');
-    thumbDiv.className = 'work-thumbnail';
-    if (tweetData.imageUrls && tweetData.imageUrls.length > 0) {
-      const img = document.createElement('img');
-      img.src = tweetData.imageUrls[0];
-      thumbDiv.appendChild(img);
-    } else {
-      const placeholder = document.createElement('div');
-      placeholder.textContent = "No Image";
-      placeholder.style.textAlign = "center";
-      placeholder.style.padding = "20px";
-      thumbDiv.appendChild(placeholder);
-    }
-
-    // ハートアイコン
-    const heart = document.createElement('button');
-    heart.className = 'heart-btn';
-    heart.innerHTML = '&#9825;';
-    heart.addEventListener('click', function(e) {
-      e.stopPropagation();
-      heart.classList.toggle('liked');
-      heart.innerHTML = heart.classList.contains('liked') ? '&#10084;' : '&#9825;';
-    });
-    thumbDiv.appendChild(heart);
-
-    wrapper.appendChild(infoDiv);
-    wrapper.appendChild(thumbDiv);
-    worksGrid.appendChild(wrapper);
-
-    // サムネイルクリックで Full Image Modal を開く
-    thumbDiv.addEventListener('click', function() {
-      openFullImageModal(tweetData.imageUrls);
-    });
+  // サムネイルエリア（下段）：枠線で囲む
+  const thumbDiv = document.createElement('div');
+  thumbDiv.className = 'work-thumbnail';
+  if (tweetData.imageUrls && tweetData.imageUrls.length > 0) {
+    const img = document.createElement('img');
+    img.src = tweetData.imageUrls[0];
+    thumbDiv.appendChild(img);
+  } else {
+    const placeholder = document.createElement('div');
+    placeholder.textContent = "No Image";
+    placeholder.style.textAlign = "center";
+    placeholder.style.padding = "20px";
+    thumbDiv.appendChild(placeholder);
   }
+
+  // ハートアイコン（サムネイル内右下）
+  const heart = document.createElement('button');
+  heart.className = 'heart-btn';
+  heart.innerHTML = '&#9825;';
+  heart.addEventListener('click', function(e) {
+    e.stopPropagation();
+    heart.classList.toggle('liked');
+    heart.innerHTML = heart.classList.contains('liked') ? '&#10084;' : '&#9825;';
+  });
+  thumbDiv.appendChild(heart);
+
+  wrapper.appendChild(infoDiv);
+  wrapper.appendChild(thumbDiv);
+  worksGrid.appendChild(wrapper);
+
+  // サムネイルクリックで Full Image Modal を開く
+  thumbDiv.addEventListener('click', function() {
+    openFullImageModal(tweetData.imageUrls);
+  });
+}
 
   /* --- Full Image Modal --- */
   const fullImageModal = document.getElementById('fullImageModal');
@@ -211,14 +211,23 @@ document.addEventListener('DOMContentLoaded', function() {
     imageUrls.forEach(url => {
       const img = document.createElement('img');
       img.src = url;
-      img.style.width = "450px"; // 画像は大きめに固定表示
+      img.style.width = "550px"; // 画像は550pxに固定
       fullImageContainer.appendChild(img);
     });
     fullImageModal.style.display = 'flex';
     // Full Image Modalはぼかさず、背景（headerとmainContent）にぼかしを適用
     header.classList.add('blur-background');
     mainContent.classList.add('blur-background');
+    // モーダル外クリックで閉じる処理を追加（Full Image Modal用）
+    fullImageModal.addEventListener('click', function(e) {
+      if (e.target === fullImageModal) {
+        fullImageModal.style.display = 'none';
+        header.classList.remove('blur-background');
+        mainContent.classList.remove('blur-background');
+      }
+    });
   }
+  
 
   closeFullImageModalBtn.addEventListener('click', function() {
     fullImageModal.style.display = 'none';
