@@ -1,10 +1,11 @@
 // netlify/functions/twitter.js
 
-const fetch = require('node-fetch');  // Netlify Functions で fetch を使うため、node-fetch を利用
+async function getFetch() {
+  const fetchModule = await import('node-fetch');
+  return fetchModule.default;
+}
 
-// ツイートURLからツイートIDを抽出する関数
 function extractTweetId(postUrl) {
-  // 例: https://twitter.com/username/status/1234567890
   const regex = /status\/(\d+)/;
   const match = postUrl.match(regex);
   if (match && match[1]) {
@@ -15,10 +16,8 @@ function extractTweetId(postUrl) {
 
 module.exports = {
   handler: async function(event, context) {
-    // クエリパラメーターから投稿URLを取得
     const queryParams = event.queryStringParameters || {};
     const postUrl = queryParams.postUrl;
-    
     if (!postUrl) {
       return {
         statusCode: 400,
@@ -26,7 +25,6 @@ module.exports = {
       };
     }
     
-    // ツイートIDを抽出
     const tweetId = extractTweetId(postUrl);
     if (!tweetId) {
       return {
@@ -35,10 +33,7 @@ module.exports = {
       };
     }
     
-    // Twitter API のエンドポイント
     const endpoint = `https://api.twitter.com/2/tweets/${tweetId}?expansions=attachments.media_keys&media.fields=url`;
-    
-    // Bearer Token を環境変数から取得（Netlify の環境変数に設定してください）
     const bearerToken = process.env.TWITTER_BEARER_TOKEN;
     if (!bearerToken) {
       return {
@@ -48,13 +43,12 @@ module.exports = {
     }
     
     try {
-      // Twitter API にリクエストを送る
+      const fetch = await getFetch();
       const apiResponse = await fetch(endpoint, {
         headers: {
           "Authorization": `Bearer ${bearerToken}`
         }
       });
-      
       if (!apiResponse.ok) {
         const errText = await apiResponse.text();
         return {
@@ -62,25 +56,21 @@ module.exports = {
           body: JSON.stringify({ error: "Twitter API error", details: errText }),
         };
       }
-      
       const tweetData = await apiResponse.json();
-      
-      // 画像のURLを抽出（ツイートに添付された画像情報が含まれている場合）
       let imageUrls = [];
       if (tweetData && tweetData.includes && tweetData.includes.media) {
-        imageUrls = tweetData.includes.media.map(media => media.url).filter(url => url);
+        imageUrls = tweetData.includes.media
+          .filter(media => media.url)
+          .map(media => media.url);
       }
-      
       return {
         statusCode: 200,
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: "Successfully retrieved tweet data",
           tweetId: tweetId,
           imageUrls: imageUrls,
-          rawData: tweetData  // 必要に応じて、後でデバッグ用に残すか削除してください
+          rawData: tweetData
         })
       };
     } catch (error) {

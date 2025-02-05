@@ -4,23 +4,138 @@
   <meta charset="UTF-8">
   <title>Final Fantasy XIV Housing Hopper Pro</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- styles.css をリンク -->
+  <!-- 必要に応じてGoogle Fontsなど追加 -->
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <!-- ここにホームページの内容を記述していきます -->
-  
-  <!-- 投稿URL入力フォーム -->
-<section id="post-url-section">
-  <h2>Enter your X (Twitter) Post URL</h2>
-  <form id="postUrlForm">
-    <input type="url" id="postUrlInput" placeholder="https://twitter.com/username/status/1234567890" required>
-    <button type="submit">Submit</button>
-  </form>
-</section>
+  <!-- ヘッダー（常に表示） -->
+  <header class="site-header">
+    <div class="header-left">
+      <h1>Final Fantasy XIV Housing Hopper Pro</h1>
+    </div>
+    <div class="header-right">
+      <button id="browseWorksBtn">見て回る</button>
+      <button id="loginBtn">Login</button>
+    </div>
+  </header>
 
+  <!-- 作品登録用ボタン（常に右下に固定） -->
+  <div class="open-modal-btn-container">
+    <button id="openRegistrationModalBtn">作品を登録する</button>
+  </div>
 
-  <!-- script.js を読み込み -->
+  <!-- 登録用モーダル（画面中央に固定、縦スクロール可能） -->
+  <div id="registerModal" class="modal-overlay">
+    <div class="modal">
+      <h2>作品登録</h2>
+      <!-- エラーオーバーレイ：必須項目未入力時に上部に表示 -->
+      <div id="errorOverlay" class="error-overlay"></div>
+      <!-- ローディングオーバーレイ -->
+      <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-animation">
+          <span class="loading-text">Housing Hopper Pro</span>
+        </div>
+      </div>
+      <form id="registrationForm">
+        <!-- 論理データセンター -->
+        <div class="form-group">
+          <label for="dataCenterSelect">論理データセンター</label>
+          <select id="dataCenterSelect" required>
+            <option value="">選択してください</option>
+            <option value="Elemental">Elemental</option>
+            <option value="Gaia">Gaia</option>
+            <option value="Mana">Mana</option>
+            <option value="Meteor">Meteor</option>
+            <option value="Aether">Aether</option>
+            <option value="Primal">Primal</option>
+            <option value="Crystal">Crystal</option>
+            <option value="Dynamis">Dynamis</option>
+            <option value="Chaos">Chaos</option>
+            <option value="Light">Light</option>
+            <option value="Shadow">Shadow</option>
+            <option value="Materia">Materia</option>
+          </select>
+        </div>
+        <!-- ワールド（論理データセンター連動） -->
+        <div class="form-group">
+          <label for="worldSelect">ワールド</label>
+          <select id="worldSelect" required>
+            <option value="">論理データセンター選択後に選択してください</option>
+          </select>
+        </div>
+        <!-- 冒険者居住区名 -->
+        <div class="form-group">
+          <label for="residenceName">冒険者居住区名</label>
+          <select id="residenceName" required>
+            <option value="">選択してください</option>
+            <option value="Mist">Mist</option>
+            <option value="The Lavender Beds">The Lavender Beds</option>
+            <option value="The Goblet">The Goblet</option>
+            <option value="Shirogane">Shirogane</option>
+            <option value="Empyreum">Empyreum</option>
+          </select>
+        </div>
+        <!-- 住所（区） -->
+        <div class="form-group">
+          <label for="districtSelect">住所（区）</label>
+          <select id="districtSelect" required>
+            <option value="">選択してください</option>
+            <script>
+              for (let i = 1; i <= 30; i++) {
+                document.write('<option value="' + i + '">' + i + '</option>');
+              }
+            </script>
+          </select>
+        </div>
+        <!-- 番地 -->
+        <div class="form-group">
+          <label for="blockNumberSelect">番地</label>
+          <select id="blockNumberSelect" required>
+            <option value="">選択してください</option>
+            <script>
+              for (let i = 1; i <= 60; i++) {
+                document.write('<option value="' + i + '">' + i + '</option>');
+              }
+            </script>
+          </select>
+        </div>
+        <!-- 登録者名／作品名 -->
+        <div class="form-group">
+          <label for="registrantName">登録者名（ログイン済みの場合自動入力） / 作品名</label>
+          <input type="text" id="registrantName" placeholder="サンプル登録者名または作品名" required>
+        </div>
+        <!-- Twitter (X) 投稿URL（プレースホルダーはサンプルと分かるよう薄く表示） -->
+        <div class="form-group">
+          <label for="postUrlInput">X (Twitter) 投稿URL</label>
+          <input type="url" id="postUrlInput" placeholder="https://example.com/sample-status" required>
+        </div>
+        <div class="form-actions">
+          <button type="button" id="cancelRegistrationBtn">キャンセル</button>
+          <button type="submit" id="submitRegistrationBtn">登録する</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Full Image Modal（サムネイルクリックで表示、モーダルは登録用と同じデザイン） -->
+  <div id="fullImageModal" class="modal-overlay">
+    <div class="modal full-image-modal">
+      <!-- ヘッダー文言「投稿画像一覧」は削除（不要） -->
+      <div id="fullImageContainer" class="full-image-container">
+        <!-- 全画像を大きめに並べる -->
+      </div>
+      <button id="closeFullImageModalBtn" class="modal-close-btn">閉じる</button>
+    </div>
+  </div>
+
+  <!-- メインコンテンツ（背景ぼかし対象：ヘッダーも含む） -->
+  <div id="mainContent">
+    <!-- グリッド表示エリア（固定5列、16:9画面想定） -->
+    <section id="works-grid">
+      <!-- 各グリッドアイテムは script.js により動的生成 -->
+    </section>
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>
