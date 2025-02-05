@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
   /* --- グリッド表示エリアの更新 --- */
   function updateGrid(tweetData, regInfo) {
     const worksGrid = document.getElementById('works-grid');
-    worksGrid.innerHTML = '';
+    // worksGrid.innerHTML = '';
 
     // グリッドアイテム全体のラッパーを生成
     const wrapper = document.createElement('div');
@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
     imageUrls.forEach(url => {
       const img = document.createElement('img');
       img.src = url;
-      img.style.width = "300px"; // 画像は大きめに固定表示
+      img.style.width = "450px"; // 画像は大きめに固定表示
       fullImageContainer.appendChild(img);
     });
     fullImageModal.style.display = 'flex';
