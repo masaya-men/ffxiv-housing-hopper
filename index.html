@@ -89,25 +89,43 @@
         </div>
         <!-- 番地 -->
         <div class="form-group">
-          <label for="blockNumberSelect">番地</label>
-          <select id="blockNumberSelect" required>
+          <label for="blockNumberSelect">番地<span class="small-text">または</span>アパート</label>
+          <select id="blockNumberSelect" required="">
             <option value="">選択してください</option>
+            <!-- Apartment オプションを追加 -->
+            <option value="Apartment 1">Apartment 1</option>
+            <option value="Apartment 2">Apartment 2</option>
+            <!-- 数値オプション -->
             <script>
               for (let i = 1; i <= 60; i++) {
                 document.write('<option value="' + i + '">' + i + '</option>');
               }
             </script>
           </select>
+          
         </div>
+
+        <div id="roomNumberContainer" class="form-group" style="display:none;">
+          <label for="roomNumberSelect">部屋番号</label>
+          <select id="roomNumberSelect" required>
+            <option value="">選択してください</option>
+            <script>
+              for (let i = 1; i <= 90; i++) {
+                document.write('<option value="' + i + '">' + i + '</option>');
+              }
+            </script>
+          </select>
+        </div>
+        
         <!-- 登録者名／作品名 -->
         <div class="form-group">
           <label for="registrantName">登録者名（ログイン済みの場合自動入力） / 作品名</label>
-          <input type="text" id="registrantName" placeholder="サンプル登録者名または作品名" required>
+          <input type="text" id="registrantName" placeholder="サンプル登録者名または作品名" required autocomplete="off">
         </div>
         <!-- Twitter (X) 投稿URL（プレースホルダーはサンプルと分かるよう薄く表示） -->
         <div class="form-group">
           <label for="postUrlInput">X (Twitter) 投稿URL</label>
-          <input type="url" id="postUrlInput" placeholder="https://example.com/sample-status" required>
+          <input type="url" id="postUrlInput" placeholder="https://example.com/sample-status" required autocomplete="off">
         </div>
         <div class="form-actions">
           <button type="button" id="cancelRegistrationBtn">キャンセル</button>

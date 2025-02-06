@@ -10,6 +10,23 @@ document.addEventListener('DOMContentLoaded', function() {
   const loadingOverlay = document.getElementById('loadingOverlay');
   const mainContent = document.getElementById('mainContent');
   const header = document.querySelector('.site-header');
+  const blockNumberSelect = document.getElementById('blockNumberSelect');
+  const roomNumberContainer = document.getElementById('roomNumberContainer');
+  const roomNumberSelect = document.getElementById('roomNumberSelect');
+
+  blockNumberSelect.addEventListener('change', function() {
+    // "Apartment 1" または "Apartment 2" が選択された場合
+    if (this.value === "Apartment 1" || this.value === "Apartment 2") {
+      roomNumberContainer.style.display = 'block';
+      // 部屋番号入力欄を必須に設定
+      roomNumberSelect.setAttribute('required', 'true');
+    } else {
+      roomNumberContainer.style.display = 'none';
+      // 必須属性を削除
+      roomNumberSelect.removeAttribute('required');
+    }
+  });
+  
 
   // モーダルを開くとき：フォームリセット、エラークリア、モーダル表示、背景ぼかし適用（mainContentとheader）
   openModalBtn.addEventListener('click', function() {
@@ -66,10 +83,9 @@ document.addEventListener('DOMContentLoaded', function() {
   dataCenterSelect.addEventListener('change', function() {
     const selected = this.value;
     worldSelect.innerHTML = "";
-    // 初期プレースホルダーは「論理データセンター選択後に選択してください」か、選択済みなら「選択してください」
     const defaultOpt = document.createElement('option');
     defaultOpt.value = "";
-    defaultOpt.textContent = selected ? "選択してください" : "論理データセンター選択後に選択してください";
+    defaultOpt.textContent = selected ? "選択してください" : "まず論理データセンターを選択してください";
     worldSelect.appendChild(defaultOpt);
     if (worldMapping[selected]) {
       worldMapping[selected].forEach(world => {
@@ -80,7 +96,15 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
   });
-
+  
+  const residenceMapping = {
+    "Mist": "Topmast",
+    "The Lavender Beds": "Lily Hills",
+    "The Goblet": "Sultana's Breath",
+    "Shirogane": "Kobai Goten",
+    "Empyreum": "イングルサイド"
+  };
+  
   /* --- 登録フォーム送信 --- */
   registrationForm.addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -97,12 +121,16 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!world) missingFields.push("ワールド");
     if (!residenceName) missingFields.push("冒険者居住区名");
     if (!district) missingFields.push("住所（区）");
-    if (!block) missingFields.push("番地");
+    if (!block) missingFields.push("番地またはアパート");
     if (!registrantName) missingFields.push("登録者名/作品名");
     if (!postUrl) missingFields.push("Twitter投稿URL");
     
+    // Apartmentの場合は、部屋番号も必須とする
+    if ((block === "Apartment 1" || block === "Apartment 2") && !roomNumberSelect.value) {
+      missingFields.push("部屋番号");
+    }
+    
     if (missingFields.length > 0) {
-      // エラーメッセージはシンプルに未入力項目のみを表示
       showErrorOverlay("未入力: " + missingFields.join(", "));
       return;
     }
@@ -115,9 +143,24 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       const tweetData = await response.json();
       console.log("Server response:", tweetData);
-      // 住所情報は「冒険者居住区名 + 空白 + 住所（区） - 番地」
-      const addressData = `${residenceName} ${district} - ${block}`;
-      updateGrid(tweetData, { registrantName, dataCenter, world, addressData, postUrl });
+      let addressData;
+      if (block === "Apartment 1" || block === "Apartment 2") {
+        const roomNumber = document.getElementById('roomNumberSelect').value;
+        // "Apartment 1" → "1", "Apartment 2" → "2" を抽出
+        const apartmentNumber = block.replace("Apartment ", "");
+        addressData = `${residenceName} ${district} ${residenceMapping[residenceName]} ${apartmentNumber}-${roomNumber}`;
+      } else {
+        addressData = `${residenceName} ${district} - ${block}`;
+      }
+      
+            
+      // regInfo に部屋番号も追加（Apartmentの場合）
+      const regInfo = { registrantName, dataCenter, world, addressData, postUrl };
+      if (block === "Apartment 1" || block === "Apartment 2") {
+        regInfo.roomNumber = roomNumberSelect.value;
+      }
+      
+      updateGrid(tweetData, regInfo);
       closeModal();
     } catch (error) {
       console.error("Error during registration:", error);
@@ -126,6 +169,7 @@ document.addEventListener('DOMContentLoaded', function() {
       loadingOverlay.style.display = 'none';
     }
   });
+  
 
 /* --- グリッド表示エリアの更新 --- */
 function updateGrid(tweetData, regInfo) {
@@ -211,7 +255,7 @@ function updateGrid(tweetData, regInfo) {
     imageUrls.forEach(url => {
       const img = document.createElement('img');
       img.src = url;
-      img.style.width = "550px"; // 画像は550pxに固定
+      // 画像の固定幅指定を削除し、CSSで管理する
       fullImageContainer.appendChild(img);
     });
     fullImageModal.style.display = 'flex';
@@ -228,7 +272,7 @@ function updateGrid(tweetData, regInfo) {
     });
   }
   
-
+  
   closeFullImageModalBtn.addEventListener('click', function() {
     fullImageModal.style.display = 'none';
     header.classList.remove('blur-background');
